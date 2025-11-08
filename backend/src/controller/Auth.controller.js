@@ -51,6 +51,7 @@ async function register(req, res) {
 }
 
 async function login(req, res) {
+    console.log("login req.body:",req.body)
   const parsed = loginSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
 
