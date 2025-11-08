@@ -1,4 +1,5 @@
 // lib/main.dart
+import 'package:basic_app/features/attendance/presentation/pages/attendance_page.dart';
 import 'package:basic_app/features/auth/presentation/pages/login_page.dart';
 import 'package:basic_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +44,7 @@ class _AppState extends ConsumerState<App> {
       home: !_bootstrapped || authState is AuthLoading
           ? const _Splash()
           : authState is AuthAuthenticated
-              ? const CheckInPage()
+              ? const AttendancePage()  //CheckInPage()
               : const LoginPage(),
     );
   }
