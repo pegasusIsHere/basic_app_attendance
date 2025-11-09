@@ -29,10 +29,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final data = _asMap(res.data);
       final tokens = _tokensFromResponse(data);
 
-      // If backend didn’t include user, fetch it using the fresh access token.
+      // Fetch user using the fresh access token with explicit header
+      // This should work even if storage doesn't have the token yet
       final user = data['user'] is Map<String, dynamic>
           ? UserModel.fromJson(_asMap(data['user']))
-          : await me(tokens.accessToken);
+          : await _dio.get(
+              '$_baseUrl/auth/me',
+              options: Options(
+                headers: {
+                  'Authorization': 'Bearer ${tokens.accessToken}',
+                  'Accept': 'application/json',
+                },
+              ),
+            ).then((response) => UserModel.fromJson(_asMap(response.data)));
 
       return (tokens, user);
     } on DioException catch (e) {

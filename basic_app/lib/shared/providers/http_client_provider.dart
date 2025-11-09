@@ -21,11 +21,13 @@ final dioProvider = Provider<Dio>((ref) {
   dio.interceptors.add(
     InterceptorsWrapper(
       onRequest: (options, handler) async {
-        // Only if you use secure storage; remove if you don't.
-        final storage = ref.read(secureStorageProvider);
-        final token = await storage.read(key: 'auth.access'); // Changed from 'access_token' to 'auth.access'
-        if (token != null && token.isNotEmpty) {
-          options.headers['Authorization'] = 'Bearer $token';
+        // Only add Authorization header if it's not already set explicitly
+        if (!options.headers.containsKey('Authorization')) {
+          final storage = ref.read(secureStorageProvider);
+          final token = await storage.read(key: 'auth.access');
+          if (token != null && token.isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
         }
         handler.next(options);
       },
