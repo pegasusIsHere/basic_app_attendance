@@ -29,6 +29,7 @@ class AttendanceHistoryList extends ConsumerWidget {
       separatorBuilder: (_, __) => const Divider(height: 1),
       itemBuilder: (_, i) {
         final e = history[i];
+        print('divisionnnnn ${e.status}');
         return ListTile(
           leading: const Icon(Icons.location_on),
           title: Text(e.divisionName ?? e.divisionId),
