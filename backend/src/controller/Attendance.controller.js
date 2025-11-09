@@ -91,13 +91,35 @@ async function listMyAttendance(req, res) {
     const uid = toId(req.userId || req.user?.id || req.user?._id);
     if (!uid) return res.status(401).json({ error: 'unauthorized' });
 
-    const rows = await Attendance.find(
-      { userId: uid },
-      { divisionId: 1, coord: 1, status: 1, checkedAt: 1 }
-    )
-      .sort({ checkedAt: -1 })
-      .limit(100)
-      .lean();
+    const rows = await Attendance.aggregate([
+      { $match: { userId: uid } },
+      {
+        $lookup: {
+          from: 'divisions',
+          localField: 'divisionId',
+          foreignField: '_id',
+          as: 'division'
+        }
+      },
+      {
+        $unwind: {
+          path: '$division',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          divisionId: 1,
+          divisionName: '$division.name',
+          coord: 1,
+          status: 1,
+          checkedAt: 1
+        }
+      },
+      { $sort: { checkedAt: -1 } },
+      { $limit: 100 }
+    ]);
 
     return res.json(rows);
   } catch (e) {
