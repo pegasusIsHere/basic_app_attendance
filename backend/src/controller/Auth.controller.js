@@ -107,8 +107,9 @@ async function refresh(req, res) {
     return res.status(401).json({ message: 'Refresh token mismatch' });
   }
 
-  const newAccess = signAccessToken(user._id);
-  const newRefresh = signRefreshToken(user._id);
+  // Fix: Pass the full user object, not just user._id
+  const newAccess = signAccessToken(user);
+  const newRefresh = signRefreshToken(user);
   user.refreshTokenHash = await hashToken(newRefresh);
   await user.save();
 
